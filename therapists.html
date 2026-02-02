@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find a Therapist - MindSpace</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <span>🧠</span> MindSpace
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="therapists.html" class="active">Find a Therapist</a></li>
+                <li><a href="how-it-works.html">How It Works</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="login.html" class="btn btn-outline btn-sm">Log In</a>
+                <a href="signup-user.html" class="btn btn-primary btn-sm">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main style="padding: var(--spacing-2xl) 0;">
+        <div class="container">
+            <div class="page-header">
+                <h1>Find a Therapist</h1>
+                <p>Browse our directory of licensed mental health professionals.</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-bar">
+                <div class="filter-group" style="flex: 1;">
+                    <label class="filter-label">Search:</label>
+                    <input type="text" id="search-input" class="form-input" placeholder="Search by name..." style="width: 100%;">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Specialization:</label>
+                    <select id="specialization-filter" class="form-select">
+                        <option value="">All Specializations</option>
+                        <option value="Anxiety">Anxiety</option>
+                        <option value="Depression">Depression</option>
+                        <option value="Trauma">Trauma & PTSD</option>
+                        <option value="Relationships">Relationships</option>
+                        <option value="Family">Family Therapy</option>
+                        <option value="Addiction">Addiction</option>
+                        <option value="Eating Disorders">Eating Disorders</option>
+                        <option value="Stress Management">Stress Management</option>
+                        <option value="Grief">Grief & Loss</option>
+                        <option value="LGBTQ+">LGBTQ+ Issues</option>
+                        <option value="Career">Career Counseling</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <button id="clear-filters" class="btn btn-secondary btn-sm">Clear</button>
+            </div>
+
+            <!-- Results Count -->
+            <div id="results-count" style="margin-bottom: var(--spacing-lg); color: var(--text-secondary);"></div>
+
+            <!-- Therapists Grid -->
+            <div id="therapists-container" class="therapists-grid">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4 style="display: flex; align-items: center; gap: var(--spacing-sm);"><span>🧠</span> MindSpace</h4>
+                    <p style="color: rgba(255,255,255,0.7); font-size: var(--font-size-sm);">Making mental health support accessible, affordable, and convenient for everyone.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>For Clients</h4>
+                    <ul>
+                        <li><a href="therapists.html">Find a Therapist</a></li>
+                        <li><a href="how-it-works.html">How It Works</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>For Therapists</h4>
+                    <ul>
+                        <li><a href="signup-therapist.html">Join as Therapist</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 MindSpace. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="app.js"></script>
+    <script>
+        let allTherapists = [];
+
+        // Load therapists
+        async function loadTherapists() {
+            const container = document.getElementById('therapists-container');
+            
+            try {
+                const { data: therapists, error } = await supabaseClient
+                    .from('Therapists')
+                    .select('*')
+                    .eq('approval_status', 'approved')
+                    .eq('Active', true)
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Error loading therapists:', error);
+                    container.innerHTML = '<div class="alert alert-error">Failed to load therapists. Please try again.</div>';
+                    return;
+                }
+                
+                allTherapists = therapists || [];
+                renderTherapists();
+                
+            } catch (error) {
+                console.error('Exception loading therapists:', error);
+                container.innerHTML = '<div class="alert alert-error">An error occurred. Please try again.</div>';
+            }
+        }
+
+        // Render therapists
+        function renderTherapists() {
+            const container = document.getElementById('therapists-container');
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const specialization = document.getElementById('specialization-filter').value;
+            
+            let filtered = allTherapists.filter(t => {
+                const nameMatch = !searchTerm || (t.Name || '').toLowerCase().includes(searchTerm);
+                const specMatch = !specialization || t.Specialization === specialization;
+                return nameMatch && specMatch;
+            });
+            
+            document.getElementById('results-count').textContent = `Showing ${filtered.length} therapist${filtered.length !== 1 ? 's' : ''}`;
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-state-icon">🔍</div>
+                        <h3 class="empty-state-title">No therapists found</h3>
+                        <p class="empty-state-description">Try adjusting your search criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = filtered.map(therapist => `
+                <div class="therapist-card">
+                    <div class="therapist-header">
+                        <div class="therapist-avatar">
+                            ${therapist.Name ? therapist.Name.split(' ').map(n => n[0]).join('').toUpperCase() : 'T'}
+                        </div>
+                        <div class="therapist-name">${therapist.Name}</div>
+                        <div class="therapist-specialization">${therapist.Specialization}</div>
+                    </div>
+                    <div class="therapist-body">
+                        <div class="therapist-info">
+                            <div class="therapist-info-item">
+                                <span class="therapist-info-label">Experience</span>
+                                <span class="therapist-info-value">${therapist.experience || 0} years</span>
+                            </div>
+                            <div class="therapist-info-item">
+                                <span class="therapist-info-label">License</span>
+                                <span class="therapist-info-value">${therapist.license || 'Verified'}</span>
+                            </div>
+                        </div>
+                        <p class="therapist-bio">${therapist.bio ? therapist.bio.substring(0, 120) + '...' : 'Licensed professional therapist ready to help you on your journey.'}</p>
+                    </div>
+                    <div class="therapist-footer">
+                        <div class="therapist-fee">$${therapist.fee}<span style="font-size: var(--font-size-sm); font-weight: 400; color: var(--text-secondary);">/session</span></div>
+                        <a href="book-session.html?therapist=${therapist.id}" class="btn btn-primary">Book Now</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Event listeners
+        document.getElementById('search-input').addEventListener('input', debounce(renderTherapists, 300));
+        document.getElementById('specialization-filter').addEventListener('change', renderTherapists);
+        document.getElementById('clear-filters').addEventListener('click', () => {
+            document.getElementById('search-input').value = '';
+            document.getElementById('specialization-filter').value = '';
+            renderTherapists();
+        });
+
+        // Load on page load
+        document.addEventListener('DOMContentLoaded', loadTherapists);
+    </script>
+</body>
+</html>
