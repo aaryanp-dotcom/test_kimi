@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindSpace - Online Therapy & Mental Health Support</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="animations.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Hero Background Animation */
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(126, 211, 33, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(245, 166, 35, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(74, 144, 164, 0.2) 0%, transparent 40%);
+            animation: heroGradientMove 20s ease-in-out infinite;
+        }
+        
+        @keyframes heroGradientMove {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(2%, 2%) rotate(120deg); }
+            66% { transform: translate(-1%, 1%) rotate(240deg); }
+        }
+        
+        /* Floating Shapes */
+        .floating-shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: floatShape 8s ease-in-out infinite;
+        }
+        
+        .floating-shape:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #7ED321, #4A90A4);
+            top: 10%;
+            right: 10%;
+            animation-delay: 0s;
+        }
+        
+        .floating-shape:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, #F5A623, #D0021B);
+            bottom: 20%;
+            left: 5%;
+            animation-delay: -2s;
+        }
+        
+        .floating-shape:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #4A90A4, #9013FE);
+            top: 50%;
+            right: 20%;
+            animation-delay: -4s;
+        }
+        
+        @keyframes floatShape {
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            50% { transform: translateY(-30px) rotate(180deg) scale(1.1); }
+        }
+        
+        /* Stats Counter Animation */
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Feature Card Hover */
+        .feature-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(74, 144, 164, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .feature-card:hover::before {
+            left: 100%;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 10% 90%, rgba(74, 144, 164, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 90% 10%, rgba(126, 211, 33, 0.15) 0%, transparent 40%);
+            animation: ctaPulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes ctaPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        /* Therapist Card Loading Skeleton */
+        .therapist-skeleton {
+            background: var(--bg-primary);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            border: 1px solid var(--border-color);
+        }
+        
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+        }
+        
+        .scroll-indicator::before {
+            content: '↓';
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo reveal-scale">
+                <span class="animate-float">🧠</span> MindSpace
+            </a>
+            <ul class="nav-links stagger-children">
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="therapists.html">Find a Therapist</a></li>
+                <li><a href="how-it-works.html">How It Works</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="faq.html">FAQ</a></li>
+            </ul>
+            <div class="nav-actions stagger-children">
+                <a href="login.html" class="btn btn-outline btn-sm hover-lift">Log In</a>
+                <a href="signup-user.html" class="btn btn-primary btn-sm hover-lift">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" style="position: relative; min-height: 90vh; display: flex; align-items: center;">
+        <div class="hero-bg">
+            <div class="floating-shape"></div>
+            <div class="floating-shape"></div>
+            <div class="floating-shape"></div>
+        </div>
+        <div class="container hero-content" style="position: relative; z-index: 1;">
+            <div class="text-center">
+                <h1 class="reveal" style="font-size: 3.5rem; margin-bottom: var(--spacing-lg);">
+                    Your Mental Health <span style="background: linear-gradient(135deg, #F5A623, #F7C566); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Matters</span>
+                </h1>
+                <p class="reveal delay-200" style="font-size: 1.25rem; max-width: 600px; margin: 0 auto var(--spacing-xl); opacity: 0.9;">
+                    Connect with licensed therapists from the comfort of your home. Affordable, confidential, and convenient online therapy sessions.
+                </p>
+                <div class="flex justify-center gap-md reveal delay-400">
+                    <a href="signup-user.html" class="btn btn-lg hover-lift" style="background: white; color: var(--primary-color); box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                        Start Your Journey
+                        <span style="margin-left: 8px;">→</span>
+                    </a>
+                    <a href="therapists.html" class="btn btn-outline btn-lg hover-lift" style="border-color: white; color: white;">
+                        Browse Therapists
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator"></div>
+    </section>
+
+    <!-- Stats Section -->
+    <section style="padding: var(--spacing-2xl) 0; background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);">
+        <div class="container">
+            <div class="stats-grid stagger-children" style="margin-bottom: 0;">
+                <div class="text-center reveal-scale">
+                    <div class="stat-number counter" data-target="500">0</div>
+                    <div class="stat-label" style="font-size: 1.1rem; color: var(--text-secondary);">Licensed Therapists</div>
+                </div>
+                <div class="text-center reveal-scale delay-100">
+                    <div class="stat-number counter" data-target="50000">0</div>
+                    <div class="stat-label" style="font-size: 1.1rem; color: var(--text-secondary);">Sessions Completed</div>
+                </div>
+                <div class="text-center reveal-scale delay-200">
+                    <div class="stat-number counter" data-target="98">0</div>
+                    <div class="stat-label" style="font-size: 1.1rem; color: var(--text-secondary);">% Client Satisfaction</div>
+                </div>
+                <div class="text-center reveal-scale delay-300">
+                    <div class="stat-number counter" data-target="24">0</div>
+                    <div class="stat-label" style="font-size: 1.1rem; color: var(--text-secondary);">/7 Support Available</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" style="padding: var(--spacing-2xl) 0;">
+        <div class="container">
+            <h2 class="text-center reveal" style="margin-bottom: var(--spacing-xl); font-size: 2.5rem;">Why Choose MindSpace?</h2>
+            <div class="features-grid stagger-children">
+                <div class="feature-card card reveal-scale hover-lift">
+                    <div class="feature-icon animate-float">🎥</div>
+                    <h3>Video Sessions</h3>
+                    <p>Face-to-face therapy sessions from anywhere. All you need is a device with a camera and internet connection.</p>
+                </div>
+                <div class="feature-card card reveal-scale delay-100 hover-lift">
+                    <div class="feature-icon animate-float" style="animation-delay: 0.5s;">🔒</div>
+                    <h3>100% Confidential</h3>
+                    <p>Your privacy is our priority. All sessions are encrypted and your data is never shared.</p>
+                </div>
+                <div class="feature-card card reveal-scale delay-200 hover-lift">
+                    <div class="feature-icon animate-float" style="animation-delay: 1s;">💰</div>
+                    <h3>Affordable Care</h3>
+                    <p>Transparent pricing with no hidden fees. Therapy starting from just $50 per session.</p>
+                </div>
+                <div class="feature-card card reveal-scale hover-lift">
+                    <div class="feature-icon animate-float" style="animation-delay: 1.5s;">✓</div>
+                    <h3>Verified Therapists</h3>
+                    <p>All our therapists are licensed professionals with verified credentials and extensive experience.</p>
+                </div>
+                <div class="feature-card card reveal-scale delay-100 hover-lift">
+                    <div class="feature-icon animate-float" style="animation-delay: 2s;">📅</div>
+                    <h3>Flexible Scheduling</h3>
+                    <p>Book sessions at times that work for you. Reschedule easily when life gets busy.</p>
+                </div>
+                <div class="feature-card card reveal-scale delay-200 hover-lift">
+                    <div class="feature-icon animate-float" style="animation-delay: 2.5s;">⭐</div>
+                    <h3>Quality Guaranteed</h3>
+                    <p>Not satisfied with your therapist? We'll help you find a better match at no extra cost.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Therapists Section -->
+    <section style="padding: var(--spacing-2xl) 0; background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-xl);" class="reveal">
+                <h2 style="font-size: 2rem;">Featured Therapists</h2>
+                <a href="therapists.html" class="btn btn-outline hover-lift">View All →</a>
+            </div>
+            <div id="featured-therapists" class="therapists-grid stagger-children">
+                <!-- Loading Skeletons -->
+                <div class="therapist-skeleton">
+                    <div class="skeleton-avatar" style="margin-bottom: var(--spacing-md);"></div>
+                    <div class="skeleton-line" style="width: 60%;"></div>
+                    <div class="skeleton-line short"></div>
+                    <div class="skeleton-line" style="width: 80%; margin-top: var(--spacing-md);"></div>
+                </div>
+                <div class="therapist-skeleton">
+                    <div class="skeleton-avatar" style="margin-bottom: var(--spacing-md);"></div>
+                    <div class="skeleton-line" style="width: 60%;"></div>
+                    <div class="skeleton-line short"></div>
+                    <div class="skeleton-line" style="width: 80%; margin-top: var(--spacing-md);"></div>
+                </div>
+                <div class="therapist-skeleton">
+                    <div class="skeleton-avatar" style="margin-bottom: var(--spacing-md);"></div>
+                    <div class="skeleton-line" style="width: 60%;"></div>
+                    <div class="skeleton-line short"></div>
+                    <div class="skeleton-line" style="width: 80%; margin-top: var(--spacing-md);"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section style="padding: var(--spacing-2xl) 0;">
+        <div class="container">
+            <h2 class="text-center reveal" style="margin-bottom: var(--spacing-xl); font-size: 2.5rem;">How It Works</h2>
+            <div class="features-grid">
+                <div class="text-center reveal-scale hover-lift" style="padding: var(--spacing-xl);">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; margin: 0 auto var(--spacing-lg); box-shadow: 0 10px 30px rgba(74, 144, 164, 0.3);" class="animate-pulse">1</div>
+                    <h3>Create Your Account</h3>
+                    <p>Sign up in minutes. Tell us about yourself and what you're looking for in a therapist.</p>
+                </div>
+                <div class="text-center reveal-scale delay-100 hover-lift" style="padding: var(--spacing-xl);">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; margin: 0 auto var(--spacing-lg); box-shadow: 0 10px 30px rgba(74, 144, 164, 0.3);" class="animate-pulse" style="animation-delay: 0.5s;">2</div>
+                    <h3>Choose Your Therapist</h3>
+                    <p>Browse our directory of licensed therapists. Filter by specialization, price, and availability.</p>
+                </div>
+                <div class="text-center reveal-scale delay-200 hover-lift" style="padding: var(--spacing-xl);">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; margin: 0 auto var(--spacing-lg); box-shadow: 0 10px 30px rgba(74, 144, 164, 0.3);" class="animate-pulse" style="animation-delay: 1s;">3</div>
+                    <h3>Book Your Session</h3>
+                    <p>Select a convenient time slot and book your session. Pay securely online.</p>
+                </div>
+                <div class="text-center reveal-scale delay-300 hover-lift" style="padding: var(--spacing-xl);">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; margin: 0 auto var(--spacing-lg); box-shadow: 0 10px 30px rgba(74, 144, 164, 0.3);" class="animate-pulse" style="animation-delay: 1.5s;">4</div>
+                    <h3>Start Your Journey</h3>
+                    <p>Join your video session at the scheduled time. Begin your path to better mental health.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" style="padding: var(--spacing-2xl) 0; background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%); position: relative;">
+        <div class="container text-center" style="position: relative; z-index: 1;">
+            <h2 class="reveal" style="margin-bottom: var(--spacing-md); color: white; font-size: 2.5rem;">Ready to Get Started?</h2>
+            <p class="reveal delay-200" style="max-width: 600px; margin: 0 auto var(--spacing-xl); color: rgba(255,255,255,0.9); font-size: 1.1rem;">Take the first step towards better mental health. Join thousands of people who have found support through MindSpace.</p>
+            <div class="flex justify-center gap-md reveal delay-400">
+                <a href="signup-user.html" class="btn btn-lg hover-lift" style="background: white; color: var(--primary-color); box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                    Sign Up Now
+                    <span style="margin-left: 8px;">→</span>
+                </a>
+                <a href="therapists.html" class="btn btn-outline btn-lg hover-lift" style="border-color: white; color: white;">Browse Therapists</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid reveal">
+                <div class="footer-section">
+                    <h4 style="display: flex; align-items: center; gap: var(--spacing-sm);"><span>🧠</span> MindSpace</h4>
+                    <p style="color: rgba(255,255,255,0.7); font-size: var(--font-size-sm);">Making mental health support accessible, affordable, and convenient for everyone.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>For Clients</h4>
+                    <ul>
+                        <li><a href="therapists.html" class="hover-lift">Find a Therapist</a></li>
+                        <li><a href="how-it-works.html" class="hover-lift">How It Works</a></li>
+                        <li><a href="faq.html" class="hover-lift">FAQ</a></li>
+                        <li><a href="signup-user.html" class="hover-lift">Sign Up</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>For Therapists</h4>
+                    <ul>
+                        <li><a href="signup-therapist.html" class="hover-lift">Join as Therapist</a></li>
+                        <li><a href="about.html" class="hover-lift">About Us</a></li>
+                        <li><a href="contact.html" class="hover-lift">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html" class="hover-lift">Privacy Policy</a></li>
+                        <li><a href="terms.html" class="hover-lift">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom reveal">
+                <p>&copy; 2024 MindSpace. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="app.js"></script>
+    <script src="animations.js"></script>
+    <script>
+        // Load featured therapists with animation
+        async function loadFeaturedTherapists() {
+            const container = document.getElementById('featured-therapists');
+            
+            try {
+                const { data: therapists, error } = await supabaseClient
+                    .from('Therapists')
+                    .select('*')
+                    .eq('approval_status', 'approved')
+                    .eq('Active', true)
+                    .limit(3);
+                
+                if (error) {
+                    console.error('Error loading therapists:', error);
+                    container.innerHTML = '<p class="text-center">Unable to load therapists at this time.</p>';
+                    return;
+                }
+                
+                if (!therapists || therapists.length === 0) {
+                    container.innerHTML = '<p class="text-center">No therapists available at this time.</p>';
+                    return;
+                }
+                
+                // Fade out skeletons and fade in content
+                container.style.opacity = '0';
+                
+                setTimeout(() => {
+                    container.innerHTML = therapists.map((therapist, index) => `
+                        <div class="therapist-card reveal-scale" style="animation-delay: ${index * 100}ms;">
+                            <div class="therapist-header">
+                                <div class="therapist-avatar">
+                                    ${therapist.Name ? therapist.Name.split(' ').map(n => n[0]).join('').toUpperCase() : 'T'}
+                                </div>
+                                <div class="therapist-name">${therapist.Name}</div>
+                                <div class="therapist-specialization">${therapist.Specialization}</div>
+                            </div>
+                            <div class="therapist-body">
+                                <div class="therapist-info">
+                                    <div class="therapist-info-item">
+                                        <span class="therapist-info-label">Experience</span>
+                                        <span class="therapist-info-value">${therapist.experience || 0} years</span>
+                                    </div>
+                                    <div class="therapist-info-item">
+                                        <span class="therapist-info-label">License</span>
+                                        <span class="therapist-info-value">${therapist.license || 'Verified'}</span>
+                                    </div>
+                                </div>
+                                <p class="therapist-bio">${therapist.bio ? therapist.bio.substring(0, 100) + '...' : 'Licensed professional therapist ready to help you on your journey.'}</p>
+                            </div>
+                            <div class="therapist-footer">
+                                <div class="therapist-fee">$${therapist.fee}<span style="font-size: var(--font-size-sm); font-weight: 400; color: var(--text-secondary);">/session</span></div>
+                                <a href="book-session.html?therapist=${therapist.id}" class="btn btn-primary hover-lift">Book Now</a>
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    container.style.transition = 'opacity 0.5s ease';
+                    container.style.opacity = '1';
+                    
+                    // Add tilt effect to cards
+                    document.querySelectorAll('.therapist-card').forEach(card => {
+                        if (window.Animations && window.Animations.addTiltEffect) {
+                            window.Animations.addTiltEffect(card, 5);
+                        }
+                    });
+                }, 300);
+                
+            } catch (error) {
+                console.error('Exception loading therapists:', error);
+                container.innerHTML = '<p class="text-center">Unable to load therapists at this time.</p>';
+            }
+        }
+        
+        // Load featured therapists on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFeaturedTherapists();
+            
+            // Add hover effects to stat cards
+            document.querySelectorAll('.stat-number').forEach(stat => {
+                stat.parentElement.addEventListener('mouseenter', () => {
+                    stat.style.transform = 'scale(1.1)';
+                    stat.style.transition = 'transform 0.3s ease';
+                });
+                stat.parentElement.addEventListener('mouseleave', () => {
+                    stat.style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

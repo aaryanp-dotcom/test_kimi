@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Session - MindSpace</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="animations.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .auth-page {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 50%, var(--primary-light) 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .auth-card {
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideInUp 0.6s var(--ease-out-expo);
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .therapist-card-preview {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .therapist-card-preview:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(74, 144, 164, 0.2);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .therapist-avatar-large {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 4px 15px rgba(74, 144, 164, 0.3);
+        }
+        
+        .form-input:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(74, 144, 164, 0.2);
+        }
+        
+        .auth-header h1 {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .success-animation {
+            animation: successPop 0.5s ease;
+        }
+        
+        @keyframes successPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="auth-page">
+    <div class="auth-card" style="max-width: 600px;">
+        <div class="auth-header">
+            <h1>Book a Session</h1>
+            <p>Schedule your therapy appointment</p>
+        </div>
+        
+        <div id="error-container"></div>
+        <div id="success-container"></div>
+        
+        <!-- Therapist Info -->
+        <div id="therapist-info" class="card" style="margin-bottom: var(--spacing-lg);">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+        
+        <form id="booking-form">
+            <div class="grid grid-cols-2" style="gap: var(--spacing-md);">
+                <div class="form-group">
+                    <label class="form-label required" for="session-date">Session Date</label>
+                    <input 
+                        type="date" 
+                        id="session-date" 
+                        name="sessionDate" 
+                        class="form-input" 
+                        required
+                    >
+                    <p class="form-hint">Must be today or later</p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label required" for="start-time">Start Time</label>
+                    <input 
+                        type="time" 
+                        id="start-time" 
+                        name="startTime" 
+                        class="form-input" 
+                        required
+                    >
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label required" for="problem-description">What would you like to discuss?</label>
+                <textarea 
+                    id="problem-description" 
+                    name="problemDescription" 
+                    class="form-textarea" 
+                    rows="4"
+                    placeholder="Briefly describe what you'd like to talk about in this session..."
+                    required
+                ></textarea>
+            </div>
+            
+            <input type="hidden" id="therapist-id" name="therapistId">
+            
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="book-btn">
+                Confirm Booking
+            </button>
+            <a href="therapists.html" class="btn btn-secondary btn-block" style="margin-top: var(--spacing-sm);">Cancel</a>
+        </form>
+    </div>
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="app.js"></script>
+    <script src="animations.js"></script>
+    <script>
+        let therapistData = null;
+        let currentUser = null;
+
+        // Get therapist ID from URL
+        function getTherapistIdFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('therapist');
+        }
+
+        // Load therapist info
+        async function loadTherapistInfo(therapistId) {
+            const container = document.getElementById('therapist-info');
+            
+            try {
+                const { data: therapist, error } = await supabaseClient
+                    .from('Therapists')
+                    .select('*')
+                    .eq('id', therapistId)
+                    .eq('approval_status', 'approved')
+                    .eq('Active', true)
+                    .single();
+                
+                if (error || !therapist) {
+                    container.innerHTML = '<div class="alert alert-error">Therapist not found or not available.</div>';
+                    document.getElementById('booking-form').style.display = 'none';
+                    return;
+                }
+                
+                therapistData = therapist;
+                document.getElementById('therapist-id').value = therapistId;
+                
+                container.innerHTML = `
+                    <div class="therapist-card-preview">
+                        <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                            <div class="therapist-avatar-large">
+                                ${therapist.Name ? therapist.Name.split(' ').map(n => n[0]).join('').toUpperCase() : 'T'}
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; font-size: 1.1rem;">${therapist.Name}</div>
+                                <div style="font-size: var(--font-size-sm); color: var(--primary-color); background: rgba(74, 144, 164, 0.1); display: inline-block; padding: 2px 10px; border-radius: 12px; margin-top: 4px;">${therapist.Specialization}</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: var(--spacing-md); border-top: 1px solid var(--border-color);">
+                            <span style="color: var(--text-secondary); font-size: var(--font-size-sm);">Session Fee</span>
+                            <span style="font-weight: 700; font-size: 1.25rem; color: var(--primary-color);">$${therapist.fee}</span>
+                        </div>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Exception loading therapist:', error);
+                container.innerHTML = '<div class="alert alert-error">An error occurred. Please try again.</div>';
+            }
+        }
+
+        // Check authentication
+        async function checkAuth() {
+            const user = await getCurrentUser();
+            if (!user) {
+                // Store intended destination and redirect to login
+                sessionStorage.setItem('redirectAfterLogin', window.location.href);
+                window.location.href = 'login.html';
+                return false;
+            }
+            
+            // Verify user role
+            const profile = await getUserProfile(user.id);
+            if (!profile || profile.role !== 'user') {
+                document.getElementById('error-container').innerHTML = '<div class="error-message">Only clients can book sessions. Please log in with a client account.</div>';
+                document.getElementById('booking-form').style.display = 'none';
+                return false;
+            }
+            
+            currentUser = user;
+            return true;
+        }
+
+        // Handle booking form submission
+        document.getElementById('booking-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const errorContainer = document.getElementById('error-container');
+            const successContainer = document.getElementById('success-container');
+            const bookBtn = document.getElementById('book-btn');
+            
+            errorContainer.innerHTML = '';
+            successContainer.innerHTML = '';
+            
+            if (!currentUser || !therapistData) {
+                errorContainer.innerHTML = '<div class="error-message">Something went wrong. Please refresh the page.</div>';
+                return;
+            }
+            
+            // Get form values
+            const sessionDate = document.getElementById('session-date').value;
+            const startTime = document.getElementById('start-time').value;
+            const problemDescription = document.getElementById('problem-description').value.trim();
+            
+            // Validation
+            if (!sessionDate || !startTime || !problemDescription) {
+                errorContainer.innerHTML = '<div class="error-message">Please fill in all required fields.</div>';
+                return;
+            }
+            
+            if (!isFutureDate(sessionDate)) {
+                errorContainer.innerHTML = '<div class="error-message">Session date must be today or later.</div>';
+                return;
+            }
+            
+            // Show loading state
+            bookBtn.disabled = true;
+            bookBtn.innerHTML = '<span class="loading-spinner" style="width: 20px; height: 20px; border-width: 2px; display: inline-block; vertical-align: middle; margin-right: 8px;"></span> Processing...';
+            
+            try {
+                // Get user profile for patient info
+                const profile = await getUserProfile(currentUser.id);
+                
+                // Create booking
+                const { data: booking, error } = await supabaseClient
+                    .from('Bookings')
+                    .insert({
+                        user_id: currentUser.id,
+                        therapist_id: therapistData.id,
+                        session_date: sessionDate,
+                        start_time: startTime,
+                        amount: therapistData.fee,
+                        status: 'pending',
+                        patient_name: profile?.full_name || '',
+                        patient_email: profile?.email || '',
+                        problem_description: problemDescription
+                    })
+                    .select()
+                    .single();
+                
+                if (error) {
+                    console.error('Booking error:', error);
+                    errorContainer.innerHTML = `<div class="error-message">Failed to create booking: ${error.message}</div>`;
+                    bookBtn.disabled = false;
+                    bookBtn.textContent = 'Confirm Booking';
+                    return;
+                }
+                
+                successContainer.innerHTML = '<div class="success-message success-animation">Booking created successfully! You will receive a confirmation once the therapist approves your request.</div>';
+                
+                // Trigger confetti
+                if (window.Animations && window.Animations.triggerConfetti) {
+                    window.Animations.triggerConfetti();
+                }
+                
+                // Success button animation
+                bookBtn.innerHTML = '✓ Booked!';
+                bookBtn.style.background = 'linear-gradient(135deg, #7ED321, #5CB015)';
+                
+                // Clear form
+                document.getElementById('booking-form').reset();
+                
+                // Redirect to dashboard after delay
+                setTimeout(() => {
+                    window.location.href = 'user-dashboard.html';
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Exception creating booking:', error);
+                errorContainer.innerHTML = '<div class="error-message">An unexpected error occurred. Please try again.</div>';
+                bookBtn.disabled = false;
+                bookBtn.textContent = 'Confirm Booking';
+            }
+        });
+
+        // Initialize page
+        async function init() {
+            const therapistId = getTherapistIdFromUrl();
+            if (!therapistId) {
+                document.getElementById('therapist-info').innerHTML = '<div class="alert alert-error">No therapist selected. <a href="therapists.html">Browse therapists</a></div>';
+                document.getElementById('booking-form').style.display = 'none';
+                return;
+            }
+            
+            const isAuthenticated = await checkAuth();
+            if (isAuthenticated) {
+                await loadTherapistInfo(therapistId);
+            }
+        }
+
+        // Set minimum date to today
+        document.getElementById('session-date').min = new Date().toISOString().split('T')[0];
+
+        // Load on page load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
